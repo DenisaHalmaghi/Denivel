@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Core;
+namespace App\Framework;
 
-use App\Core\Router;
+use App\Framework\Router;
+use App\Controllers\TestController;
 
 class Application
 {
@@ -16,13 +17,15 @@ class Application
   {
     $this->router = new Router();
 
-    $this->router->get("elo", function () {
+    $this->router->get("/elo", function () {
       return "che fachetzi?";
     });
+
+    $this->router->get("/home", [TestController::class, "index"]);
   }
 
   public function start()
   {
-    $this->router->resolveRoute();
+    echo $this->router->resolveRoute();
   }
 }
