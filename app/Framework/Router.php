@@ -50,15 +50,15 @@ class Router
     if (is_array($action)) {
       [$controller, $method] = $action;
 
-      // if (!class_exists($controller)) {
-      //   echo "controller $controller not found";
-      //   return;
-      // }
+      if (!class_exists($controller)) {
+        echo "mah controller $controller not found";
+        return;
+      }
 
-      // if (!method_exists($controller, $method)) {
-      //   echo "method $method does not exist on $controller";
-      //   return;
-      // }
+      if (!method_exists($controller, $method)) {
+        echo "bah method $method does not exist on $controller";
+        return;
+      }
 
       return (new $controller)->$method();
     }
