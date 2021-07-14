@@ -38,6 +38,7 @@ class Container
   public function resolve(string $key)
   {
     if (!$this->isBound($key)) {
+      return null;
       // throw new BindingResolutionException();
     }
 

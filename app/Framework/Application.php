@@ -3,7 +3,7 @@
 namespace App\Framework;
 
 use App\Framework\Router;
-use App\Controllers\TestController;
+use App\Framework\Container\Container;
 
 class Application
 {
@@ -11,17 +11,29 @@ class Application
    * Class constructor.
    */
 
-  protected Router $router;
-
   public function __construct()
   {
     $this->router = new Router();
+    $this->container = Container::getInstance();
+    $this->bootstrap();
+  }
 
-    $this->router->get("/elo", function () {
-      return "che fachetzi?";
-    });
+  protected function bootstrap()
+  {
+    //regiser in container
+    $this->registerCoreServices();
+    $this->registerRoutes();
+  }
 
-    $this->router->get("/home", [TestController::class, "index"]);
+  protected function registerRoutes()
+  {
+    $routes = __DIR__ . "/../../routes/api.php";
+    require_once $routes;
+  }
+
+  protected function registerCoreServices()
+  {
+    $this->container->bind(Router::class, fn () => $this->router);
   }
 
   public function start()
