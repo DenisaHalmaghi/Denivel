@@ -2,7 +2,7 @@
 
 namespace App\Framework\Facades;
 
-use App\Framework\Router as ConcreteRouter;
+use App\Framework\Router\Router as ConcreteRouter;
 
 class Router extends Facade
 {

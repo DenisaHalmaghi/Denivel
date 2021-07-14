@@ -2,7 +2,7 @@
 
 namespace App\Framework;
 
-use App\Framework\Router;
+use App\Framework\Router\Router;
 use App\Framework\Container\Container;
 
 class Application

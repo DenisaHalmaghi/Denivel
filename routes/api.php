@@ -7,10 +7,11 @@ Router::get("/elo", function () {
   return "che fachetzi?";
 });
 
-Route::prefix('auth')->group(function () {
-  Route::get('/users', function () {
-    // Matches The "/admin/users" URL
-  });
-});
+//TODO:
+// Router::prefix('auth')->group(function () {
+//   Router::get('/users', function () {
+//     // Matches The "/admin/users" URL
+//   });
+// });
 
 Router::get("/home", [TestController::class, "index"]);
