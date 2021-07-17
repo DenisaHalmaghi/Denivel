@@ -2,18 +2,15 @@
 
 namespace App\Framework\Router;
 
-use App\Framework\Request;
+use App\Framework\Request\Request;
 
 class Router
 {
   protected $routes = [];
 
-  protected const GET = "GET";
-  protected const POST = "POST";
-  protected const PATCH = "PATCH";
-  protected const DELETE = "DELETE";
-
   protected $request;
+
+  protected $prefixes = [];
 
   /**
    * Class constructor.
@@ -25,24 +22,45 @@ class Router
 
   public function get($path, $callback)
   {
-    $this->routes[$path][self::GET] = $callback;
+    $this->routes[$path][Request::METHOD_GET] = $callback;
+  }
+
+  public function post($path, $callback)
+  {
+    $this->routes[$path][Request::METHOD_POST] = $callback;
+  }
+
+  public function prefix($prefix)
+  {
+    $this->prefixes[] = $prefix;
+    return $this;
+  }
+
+  public function group(callable $callable)
+  {
   }
 
   public function resolveRoute()
   {
     $path = $this->request->path();
-    // var_dump($path);
-    if (!array_key_exists($path, $this->routes)) {
-      echo "route not registered";
-      return;
-    }
-    $action = $this->routes[$path][$this->request->method()];
 
-    if (!$action) {
-      echo "no action registered for $path";
+    if (!$this->isPathRegistered($path)) {
+      echo "$path is not registered";
       return;
     }
 
+    $requestMethod = $this->request->method();
+
+    if (!$this->isMethodRegisteredForPath($path, $requestMethod)) {
+      echo "$path does not support $requestMethod requests";
+      return;
+    }
+
+    return $this->handleAction($this->routes[$path][$requestMethod]);
+  }
+
+  public function handleAction($action)
+  {
     if (is_callable($action)) {
       return $action();
     }
@@ -62,5 +80,15 @@ class Router
 
       return (new $controller)->$method();
     }
+  }
+
+  public function isPathRegistered($path)
+  {
+    return array_key_exists($path, $this->routes);
+  }
+
+  public function isMethodRegisteredForPath($path, $method)
+  {
+    return array_key_exists($method, $this->routes[$path]);
   }
 }

@@ -25,6 +25,11 @@ class Container
     return self::$instance;
   }
 
+  public static function setInstance(self $instance)
+  {
+    self::$instance = $instance;
+  }
+
   public function bind(string $key, callable $callback)
   {
     $this->bindings[$key] = [$callback, false];

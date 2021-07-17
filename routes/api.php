@@ -8,9 +8,19 @@ Router::get("/elo", function () {
 });
 
 //TODO:
+// Router::prefix('api')->group(function () {
+//   Router::prefix('v1')->group(function () {
+//     Router::prefix('auth')->group(function () {
+//       Router::get('/login', function () {
+//         return "login";
+//       });
+//     });
+//   });
+// });
+
 // Router::prefix('auth')->group(function () {
-//   Router::get('/users', function () {
-//     // Matches The "/admin/users" URL
+//   Router::get('/login', function () {
+//     return "login";
 //   });
 // });
 

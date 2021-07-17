@@ -4,31 +4,60 @@ namespace App\Framework;
 
 use App\Framework\Router\Router;
 use App\Framework\Container\Container;
+use App\Framework\Providers\RouteServiceProvider;
+use App\Framework\Providers\ServiceProvider;
 
-class Application
+class Application extends Container
 {
   /**
    * Class constructor.
    */
+  protected $providers = [];
 
-  public function __construct()
+  protected $basePath = "";
+
+  protected Container $container;
+
+  public function __construct($basePath)
   {
-    $this->router = new Router();
+    $this->basePath = $basePath;
     $this->container = Container::getInstance();
     $this->bootstrap();
   }
 
   protected function bootstrap()
   {
-    //regiser in container
-    $this->registerCoreServices();
-    $this->registerRoutes();
+    //"activate" helpers
+    require_once __DIR__ . "/helpers.php";
+
+    $this->selfBind();
+    $this->registerCoreProviders();
+    $this->bootProviders();
   }
 
-  protected function registerRoutes()
+  protected function selfBind()
   {
-    $routes = __DIR__ . "/../../routes/api.php";
-    require_once $routes;
+    static::setInstance($this);
+
+    $this->bind(Container::class, fn () => $this);
+  }
+
+  protected function registerCoreProviders()
+  {
+    $this->registerProvider(new RouteServiceProvider());
+  }
+
+  protected function registerProvider(ServiceProvider $provider)
+  {
+    $this->providers[] = $provider;
+    $provider->register();
+  }
+
+  protected function bootProviders()
+  {
+    foreach ($this->providers as $provider) {
+      $provider->boot();
+    }
   }
 
   protected function registerCoreServices()
@@ -36,8 +65,13 @@ class Application
     $this->container->bind(Router::class, fn () => $this->router);
   }
 
+  public function basePath($nestedPath)
+  {
+    return $this->basePath . "/$nestedPath";
+  }
+
   public function start()
   {
-    echo $this->router->resolveRoute();
+    echo app(Router::class)->resolveRoute();
   }
 }
