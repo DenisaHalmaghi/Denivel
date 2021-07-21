@@ -9,7 +9,6 @@ class RouteServiceProvider implements ServiceProvider
 {
   public function register()
   {
-    // echo "hehehe";
     app()->singleton(Router::class, fn () => new Router());
   }
 

@@ -32,7 +32,6 @@ class Application extends Container
 
     $this->selfBind();
     $this->registerCoreProviders();
-    $this->bootProviders();
   }
 
   protected function selfBind()
@@ -60,18 +59,30 @@ class Application extends Container
     }
   }
 
+  protected function registerUserDefinedProviders()
+  {
+    $providersFile = $this->basePath("config/providers.php");
+    $providers = (require_once $providersFile)["providers"];
+    foreach ($providers as  $provider) {
+      $this->registerProvider(new $provider());
+    }
+  }
+
   protected function registerCoreServices()
   {
     $this->container->bind(Router::class, fn () => $this->router);
   }
 
-  public function basePath($nestedPath)
+  public function basePath($nestedPath = null)
   {
-    return $this->basePath . "/$nestedPath";
+    return $nestedPath ? $this->basePath . "/$nestedPath" : $this->basePath;
   }
 
   public function start()
   {
-    echo app(Router::class)->resolveRoute();
+    $this->registerUserDefinedProviders();
+    $this->bootProviders();
+
+    echo $this->resolve(Router::class)->resolveRoute();
   }
 }

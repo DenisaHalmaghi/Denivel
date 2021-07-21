@@ -3,7 +3,7 @@
 use App\Framework\Facades\Router;
 use App\Controllers\TestController;
 
-Router::get("/elo", function () {
+Router::get("/", function () {
   return "che fachetzi?";
 });
 
