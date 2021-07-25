@@ -6,8 +6,8 @@ use App\Framework\Router\Router as ConcreteRouter;
 
 class Router extends Facade
 {
-  public static function getFacadeAccesor(): string
-  {
-    return ConcreteRouter::class;
-  }
+    public static function getFacadeAccesor(): string
+    {
+        return ConcreteRouter::class;
+    }
 }

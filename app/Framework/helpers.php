@@ -4,14 +4,14 @@ use App\Framework\Container\Container;
 
 function app($containerKey = null)
 {
-  if (!$containerKey) {
-    return Container::getInstance();
-  }
+    if (!$containerKey) {
+        return Container::getInstance();
+    }
 
-  return Container::getInstance()->resolve($containerKey);
+    return Container::getInstance()->resolve($containerKey);
 }
 
 function baseUrl($appenedUrl = "")
 {
-  return app()->getBasePath();
+    return app()->getBasePath();
 }

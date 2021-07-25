@@ -6,10 +6,15 @@
       "email": "denisa@graffino.com"
     }
   ],
-  "require": {},
+  "require": {
+    "squizlabs/php_codesniffer": "^3.6"
+  },
   "autoload": {
     "psr-4": {
       "App\\": "app/"
     }
+  },
+  "scripts": {
+    "phpcs": "phpcs --standard=PSR12"
   }
 }

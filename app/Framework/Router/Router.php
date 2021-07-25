@@ -6,89 +6,90 @@ use App\Framework\Request\Request;
 
 class Router
 {
-  protected $routes = [];
+    protected $routes = [];
 
-  protected $request;
+    protected $request;
 
-  protected $prefixes = [];
+    protected $prefixes = [];
 
   /**
    * Class constructor.
    */
-  public function __construct(Request $request = null)
-  {
-    $this->request = new Request();
-  }
-
-  public function get($path, $callback)
-  {
-    $this->routes[$path][Request::METHOD_GET] = $callback;
-  }
-
-  public function post($path, $callback)
-  {
-    $this->routes[$path][Request::METHOD_POST] = $callback;
-  }
-
-  public function prefix($prefix)
-  {
-    $this->prefixes[] = $prefix;
-    return $this;
-  }
-
-  public function group(callable $callable)
-  {
-  }
-
-  public function resolveRoute()
-  {
-    $path = $this->request->path();
-
-    if (!$this->isPathRegistered($path)) {
-      echo "$path is not registered";
-      return;
+    public function __construct(Request $request = null)
+    {
+        $this->request = new Request();
     }
 
-    $requestMethod = $this->request->method();
-
-    if (!$this->isMethodRegisteredForPath($path, $requestMethod)) {
-      echo "$path does not support $requestMethod requests";
-      return;
+    public function get($path, $callback)
+    {
+        $this->routes[$path][Request::METHOD_GET] = $callback;
     }
 
-    return $this->handleAction($this->routes[$path][$requestMethod]);
-  }
-
-  public function handleAction($action)
-  {
-    if (is_callable($action)) {
-      return $action();
+    public function post($path, $callback)
+    {
+        $this->routes[$path][Request::METHOD_POST] = $callback;
     }
 
-    if (is_array($action)) {
-      [$controller, $method] = $action;
-
-      if (!class_exists($controller)) {
-        echo "mah controller $controller not found";
-        return;
-      }
-
-      if (!method_exists($controller, $method)) {
-        echo "bah method $method does not exist on $controller";
-        return;
-      }
-
-      return (new $controller)->$method();
+    public function prefix($prefix)
+    {
+        $this->prefixes[] = $prefix;
+        return $this;
     }
-  }
 
-  public function isPathRegistered($path)
-  {
-    return array_key_exists($path, $this->routes);
-  }
+    public function group(callable $callable)
+    {
+    }
 
-  public function isMethodRegisteredForPath($path, $method)
-  {
-    return array_key_exists($method, $this->routes[$path]);
-  }
+    public function resolveRoute()
+    {
+        $path = $this->request->path();
+
+        if (!$this->isPathRegistered($path)) {
+            echo "$path is not registered";
+            return null;
+        }
+
+        $requestMethod = $this->request->method();
+
+        if (!$this->isMethodRegisteredForPath($path, $requestMethod)) {
+            echo "$path does not support $requestMethod requests";
+            return null;
+        }
+
+        return $this->handleAction($this->routes[$path][$requestMethod]);
+    }
+
+    public function handleAction($action): mixed
+    {
+        if (is_callable($action)) {
+            //inject here
+            return $action();
+        }
+
+        if (is_array($action)) {
+            [$controller, $method] = $action;
+
+            if (!class_exists($controller)) {
+                echo "controller $controller not found";
+                return;
+            }
+
+            if (!method_exists($controller, $method)) {
+                echo "method $method does not exist on $controller";
+                return;
+            }
+            //inject here
+            return (new $controller())->$method();
+        }
+    }
+
+    public function isPathRegistered($path): bool
+    {
+        return array_key_exists($path, $this->routes);
+    }
+
+    public function isMethodRegisteredForPath($path, $method): bool
+    {
+        return array_key_exists($method, $this->routes[$path]);
+    }
 }

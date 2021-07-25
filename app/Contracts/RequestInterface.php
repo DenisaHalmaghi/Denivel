@@ -1,95 +1,28 @@
 <?php
 
-namespace App\Framework\Request;
+namespace App\Contracts;
 
-use App\Contracts\RequestInterface;
-use App\Contracts\StreamInterface;
-use App\Contracts\UriInterface;
-use App\Framework\Traits\Headerable;
-
-class Request implements RequestInterface
+/**
+ * Representation of an outgoing, client-side request.
+ *
+ * Per the HTTP specification, this interface includes properties for
+ * each of the following:
+ *
+ * - Protocol version
+ * - HTTP method
+ * - URI
+ * - Headers
+ * - Message body
+ *
+ * During construction, implementations MUST attempt to set the Host header from
+ * a provided URI if no Host header is provided.
+ *
+ * Requests are considered immutable; all methods that might change state MUST
+ * be implemented such that they retain the internal state of the current
+ * message and return an instance that contains the changed state.
+ */
+interface RequestInterface extends MessageInterface
 {
-    use Headerable;
-
-    public const METHOD_GET = 'GET';
-    public const METHOD_POST = 'POST';
-    public const METHOD_PUT = 'PUT';
-    public const METHOD_PATCH = 'PATCH';
-    public const METHOD_DELETE = 'DELETE';
-
-
-
-    public function path(): string
-    {
-        $uri = explode("?", $_SERVER["REQUEST_URI"]);
-        return $uri[0];
-    }
-
-    public function method()
-    {
-        return $_SERVER["REQUEST_METHOD"];
-    }
-
-    /**
-     * Retrieves the HTTP protocol version as a string.
-     *
-     * The string MUST contain only the HTTP version number (e.g., "1.1", "1.0").
-     *
-     * @return string HTTP protocol version.
-     */
-    public function getProtocolVersion(): string
-    {
-        return "1.1";
-    }
-
-    /**
-     * Return an instance with the specified HTTP protocol version.
-     *
-     * The version string MUST contain only the HTTP version number (e.g.,
-     * "1.1", "1.0").
-     *
-     * This method MUST be implemented in such a way as to retain the
-     * immutability of the message, and MUST return an instance that has the
-     * new protocol version.
-     *
-     * @param string $version HTTP protocol version
-     * @return static
-     */
-    public function withProtocolVersion(string $version): static
-    {
-        // TODO: Implement withProtocolVersion() method.
-    }
-
-
-
-    /**
-     * Gets the body of the message.
-     *
-     * @return StreamInterface Returns the body as a stream.
-     */
-    public function getBody(): StreamInterface
-    {
-        // TODO: Implement getBody() method.
-    }
-
-    /**
-     * Return an instance with the specified message body.
-     *
-     * The body MUST be a StreamInterface object.
-     *
-     * This method MUST be implemented in such a way as to retain the
-     * immutability of the message, and MUST return a new instance that has the
-     * new body stream.
-     *
-     * @param StreamInterface $body Body.
-     * @return static
-     * @throws \InvalidArgumentException When the body is not valid.
-     */
-    public function withBody(StreamInterface $body): static
-    {
-        // TODO: Implement withBody() method.
-    }
-
     /**
      * Retrieves the message's request target.
      *
@@ -106,10 +39,7 @@ class Request implements RequestInterface
      *
      * @return string
      */
-    public function getRequestTarget(): string
-    {
-        // TODO: Implement getRequestTarget() method.
-    }
+    public function getRequestTarget(): string;
 
     /**
      * Return an instance with the specific request-target.
@@ -128,20 +58,14 @@ class Request implements RequestInterface
      * @param mixed $requestTarget
      * @return static
      */
-    public function withRequestTarget(mixed $requestTarget): static
-    {
-        // TODO: Implement withRequestTarget() method.
-    }
+    public function withRequestTarget(mixed $requestTarget): static;
 
     /**
      * Retrieves the HTTP method of the request.
      *
      * @return string Returns the request method.
      */
-    public function getMethod(): string
-    {
-        // TODO: Implement getMethod() method.
-    }
+    public function getMethod(): string;
 
     /**
      * Return an instance with the provided HTTP method.
@@ -158,10 +82,7 @@ class Request implements RequestInterface
      * @return static
      * @throws \InvalidArgumentException for invalid HTTP methods.
      */
-    public function withMethod(string $method): static
-    {
-        // TODO: Implement withMethod() method.
-    }
+    public function withMethod(string $method): static;
 
     /**
      * Retrieves the URI instance.
@@ -172,10 +93,7 @@ class Request implements RequestInterface
      * @return UriInterface Returns a UriInterface instance
      *     representing the URI of the request.
      */
-    public function getUri(): UriInterface
-    {
-        // TODO: Implement getUri() method.
-    }
+    public function getUri(): UriInterface;
 
     /**
      * Returns an instance with the provided URI.
@@ -207,8 +125,5 @@ class Request implements RequestInterface
      * @param bool $preserveHost Preserve the original state of the Host header.
      * @return static
      */
-    public function withUri(UriInterface $uri, bool $preserveHost = false): static
-    {
-        // TODO: Implement withUri() method.
-    }
+    public function withUri(UriInterface $uri, bool $preserveHost = false): static;
 }

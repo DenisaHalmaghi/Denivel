@@ -4,7 +4,7 @@ use App\Framework\Facades\Router;
 use App\Controllers\TestController;
 
 Router::get("/", function () {
-  return "che fachetzi?";
+    return "che fachetzi?";
 });
 
 //TODO:
