@@ -5,9 +5,42 @@ namespace App\Framework\Traits;
 use App\Framework\Request\Request;
 use JetBrains\PhpStorm\Pure;
 
-trait Headerable
+trait MessageTrait
 {
     protected array $headers = [];
+    protected string $body = "";
+    protected string $version = "";
+
+
+    /**
+     * Retrieves the HTTP protocol version as a string.
+     *
+     * The string MUST contain only the HTTP version number (e.g., "1.1", "1.0").
+     *
+     * @return string HTTP protocol version.
+     */
+    public function getProtocolVersion(): string
+    {
+        return $this->version;
+    }
+
+    /**
+     * Return an instance with the specified HTTP protocol version.
+     *
+     * The version string MUST contain only the HTTP version number (e.g.,
+     * "1.1", "1.0").
+     *
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * new protocol version.
+     *
+     * @param string $version HTTP protocol version
+     * @return static
+     */
+    #[Pure] public function withProtocolVersion(string $version): static
+    {
+        return new static($this->headers, $version);
+    }
 
     /**
      * Retrieves all message header values.
@@ -174,6 +207,34 @@ trait Headerable
         }
 
         return new static($headers);
+    }
+
+    /**
+     * Gets the body of the message.
+     *
+     * @return StreamInterface Returns the body as a stream.
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
+     * Return an instance with the specified message body.
+     *
+     * The body MUST be a StreamInterface object.
+     *
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return a new instance that has the
+     * new body stream.
+     *
+     * @param StreamInterface $body Body.
+     * @return static
+     * @throws \InvalidArgumentException When the body is not valid.
+     */
+    public function withBody($body): static
+    {
+        return new static($this->headers, $this->version);
     }
 
     protected function headerValueToArray(array|string $value): array

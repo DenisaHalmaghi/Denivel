@@ -5,11 +5,12 @@ namespace App\Framework\Request;
 use App\Contracts\RequestInterface;
 use App\Contracts\StreamInterface;
 use App\Contracts\UriInterface;
-use App\Framework\Traits\Headerable;
+use App\Framework\Traits\MessageTrait;
+use JetBrains\PhpStorm\Pure;
 
 class Request implements RequestInterface
 {
-    use Headerable;
+    use MessageTrait;
 
     public const METHOD_GET = 'GET';
     public const METHOD_POST = 'POST';
@@ -17,77 +18,24 @@ class Request implements RequestInterface
     public const METHOD_PATCH = 'PATCH';
     public const METHOD_DELETE = 'DELETE';
 
+    protected $target = "";
 
+    public function __construct(
+        protected string $method,
+        protected string $uri,
+        $headers = [],
+        $body = null,
+        $version = "1.1"
+    ) {
+        $this->headers == $headers;
+        $this->body == $body;
+        $this->version == $version;
+    }
 
     public function path(): string
     {
         $uri = explode("?", $_SERVER["REQUEST_URI"]);
         return $uri[0];
-    }
-
-    public function method()
-    {
-        return $_SERVER["REQUEST_METHOD"];
-    }
-
-    /**
-     * Retrieves the HTTP protocol version as a string.
-     *
-     * The string MUST contain only the HTTP version number (e.g., "1.1", "1.0").
-     *
-     * @return string HTTP protocol version.
-     */
-    public function getProtocolVersion(): string
-    {
-        return "1.1";
-    }
-
-    /**
-     * Return an instance with the specified HTTP protocol version.
-     *
-     * The version string MUST contain only the HTTP version number (e.g.,
-     * "1.1", "1.0").
-     *
-     * This method MUST be implemented in such a way as to retain the
-     * immutability of the message, and MUST return an instance that has the
-     * new protocol version.
-     *
-     * @param string $version HTTP protocol version
-     * @return static
-     */
-    public function withProtocolVersion(string $version): static
-    {
-        // TODO: Implement withProtocolVersion() method.
-    }
-
-
-
-    /**
-     * Gets the body of the message.
-     *
-     * @return StreamInterface Returns the body as a stream.
-     */
-    public function getBody(): StreamInterface
-    {
-        // TODO: Implement getBody() method.
-    }
-
-    /**
-     * Return an instance with the specified message body.
-     *
-     * The body MUST be a StreamInterface object.
-     *
-     * This method MUST be implemented in such a way as to retain the
-     * immutability of the message, and MUST return a new instance that has the
-     * new body stream.
-     *
-     * @param StreamInterface $body Body.
-     * @return static
-     * @throws \InvalidArgumentException When the body is not valid.
-     */
-    public function withBody(StreamInterface $body): static
-    {
-        // TODO: Implement withBody() method.
     }
 
     /**
@@ -130,7 +78,9 @@ class Request implements RequestInterface
      */
     public function withRequestTarget(mixed $requestTarget): static
     {
-        // TODO: Implement withRequestTarget() method.
+        $newObj = clone $this;
+        $newObj->target = $requestTarget;
+        return $newObj;
     }
 
     /**
@@ -140,7 +90,7 @@ class Request implements RequestInterface
      */
     public function getMethod(): string
     {
-        // TODO: Implement getMethod() method.
+        return $this->method;
     }
 
     /**
@@ -160,7 +110,9 @@ class Request implements RequestInterface
      */
     public function withMethod(string $method): static
     {
-        // TODO: Implement withMethod() method.
+        $newRequest = clone $this;
+        $newRequest->method = $method;
+        return $newRequest;
     }
 
     /**
@@ -174,7 +126,7 @@ class Request implements RequestInterface
      */
     public function getUri(): UriInterface
     {
-        // TODO: Implement getUri() method.
+        return $this->uri;
     }
 
     /**
@@ -209,6 +161,8 @@ class Request implements RequestInterface
      */
     public function withUri(UriInterface $uri, bool $preserveHost = false): static
     {
-        // TODO: Implement withUri() method.
+        $newRequest = clone $this;
+        $newRequest->uri = $uri;
+        return $newRequest;
     }
 }
