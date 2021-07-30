@@ -2,13 +2,14 @@
 
 namespace App\Framework\Router;
 
+use App\Contracts\ServerRequestInterface;
 use App\Framework\Request\Request;
 
 class Router
 {
-    protected $routes = [];
+    protected array $routes = [];
 
-    protected $request;
+    protected ServerRequestInterface $request;
 
     protected $prefixes = [];
 
@@ -22,12 +23,17 @@ class Router
 
     public function get($path, $callback)
     {
-        $this->routes[$path][Request::METHOD_GET] = $callback;
+        $this->routes[$path] = $this->createRoute($path, Request::METHOD_GET, $callback);
     }
 
     public function post($path, $callback)
     {
-        $this->routes[$path][Request::METHOD_POST] = $callback;
+        $this->routes[$path] = $this->createRoute($path, Request::METHOD_POST, $callback);
+    }
+
+    protected function createRoute($uri, $method, $action): Route
+    {
+        return new Route($uri, $method, $action);
     }
 
     public function prefix($prefix)
