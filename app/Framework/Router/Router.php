@@ -36,6 +36,12 @@ class Router
         return $this;
     }
 
+    public function middleware($prefix)
+    {
+        $this->prefixes[] = $prefix;
+        return $this;
+    }
+
     public function group(callable $callable)
     {
     }

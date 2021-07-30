@@ -3,12 +3,13 @@
 namespace App\Framework\Request;
 
 use App\Contracts\RequestInterface;
+use App\Contracts\ServerRequestInterface;
 use App\Contracts\StreamInterface;
 use App\Contracts\UriInterface;
 use App\Framework\Traits\MessageTrait;
 use JetBrains\PhpStorm\Pure;
 
-class Request implements RequestInterface
+class Request implements ServerRequestInterface
 {
     use MessageTrait;
 
@@ -18,18 +19,49 @@ class Request implements RequestInterface
     public const METHOD_PATCH = 'PATCH';
     public const METHOD_DELETE = 'DELETE';
 
-    protected $target = "";
+    /**
+     * @var array
+     */
+    private $attributes = [];
+
+    /**
+     * @var array
+     */
+    private $cookieParams = [];
+
+    /**
+     * @var array|object|null
+     */
+    private $parsedBody;
+
+    /**
+     * @var array
+     */
+    private $queryParams = [];
+
+    /**
+     * @var array
+     */
+    private $serverParams;
+
+    /**
+     * @var array
+     */
+    private $uploadedFiles = [];
+    protected string $target = "";
 
     public function __construct(
         protected string $method,
         protected string $uri,
         $headers = [],
         $body = null,
-        $version = "1.1"
+        $version = "1.1",
+        array $serverParams = []
     ) {
         $this->headers == $headers;
         $this->body == $body;
         $this->version == $version;
+        $this->serverParams == $serverParams;
     }
 
     public function path(): string
@@ -56,7 +88,7 @@ class Request implements RequestInterface
      */
     public function getRequestTarget(): string
     {
-        // TODO: Implement getRequestTarget() method.
+        return $this->target;
     }
 
     /**
@@ -164,5 +196,104 @@ class Request implements RequestInterface
         $newRequest = clone $this;
         $newRequest->uri = $uri;
         return $newRequest;
+    }
+
+    /**
+     * @return array
+     */
+    public function getServerParams(): array
+    {
+        return $this->serverParams;
+    }
+
+    public function getUploadedFiles(): array
+    {
+        return $this->uploadedFiles;
+    }
+
+    public function withUploadedFiles(array $uploadedFiles): static
+    {
+        $new = clone $this;
+        $new->uploadedFiles = $uploadedFiles;
+
+        return $new;
+    }
+
+    public function getCookieParams(): array
+    {
+        return $this->cookieParams;
+    }
+
+    public function withCookieParams(array $cookies): static
+    {
+        $new = clone $this;
+        $new->cookieParams = $cookies;
+
+        return $new;
+    }
+
+    public function getQueryParams(): array
+    {
+        return $this->queryParams;
+    }
+
+    public function withQueryParams(array $query): static
+    {
+        $new = clone $this;
+        $new->queryParams = $query;
+
+        return $new;
+    }
+
+    public function getParsedBody(): array|object|null
+    {
+        return $this->parsedBody;
+    }
+
+    public function withParsedBody($data): static
+    {
+        $new = clone $this;
+        $new->parsedBody = $data;
+
+        return $new;
+    }
+
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function getAttribute(string $name, $default = null): mixed
+    {
+        if (false === array_key_exists($name, $this->attributes)) {
+            return $default;
+        }
+
+        return $this->attributes[$name];
+    }
+
+    public function withAttribute($name, $value): static
+    {
+        $new = clone $this;
+        $new->attributes[$name] = $value;
+
+        return $new;
+    }
+
+    public function withoutAttribute($name): static
+    {
+        if (false === array_key_exists($name, $this->attributes)) {
+            return $this;
+        }
+
+        $new = clone $this;
+        unset($new->attributes[$name]);
+
+        return $new;
     }
 }

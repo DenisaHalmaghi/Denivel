@@ -7,7 +7,7 @@ use App\Framework\Request\Request;
 
 class TestController extends Controller
 {
-    public function index()
+    public function index(): string
     {
         return "home";
     }
