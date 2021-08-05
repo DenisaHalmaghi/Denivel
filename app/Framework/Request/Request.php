@@ -64,14 +64,11 @@ class Request implements ServerRequestInterface
         $this->serverParams == $serverParams;
     }
 
-    public static function fromGlobals(): static
+    public static function fromGlobals(): ServerRequestInterface
     {
-//        var_dump(file_get_contents("php://input"));
-//        die();
-
         return (new Request(
-            $_SERVER['REQUEST_URI'],
             $_SERVER['REQUEST_METHOD'],
+            $_SERVER['REQUEST_URI'],
             getallheaders(),
             serverParams: $_SERVER
         ))
@@ -173,7 +170,7 @@ class Request implements ServerRequestInterface
      * @return UriInterface Returns a UriInterface instance
      *     representing the URI of the request.
      */
-    public function getUri(): UriInterface
+    public function getUri(): string
     {
         return $this->uri;
     }

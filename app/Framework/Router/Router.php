@@ -55,7 +55,7 @@ class Router
 
     public function resolveRoute()
     {
-        $path = $this->request->path();
+        $path = $this->request->getUri();
 
         if (!$this->isPathRegistered($path)) {
             echo "$path is not registered";
@@ -68,32 +68,7 @@ class Router
             echo "$path does not support $requestMethod requests";
             return null;
         }
-
-        return $this->handleAction($this->routes[$path][$requestMethod]);
-    }
-
-    public function handleAction($action): mixed
-    {
-        if (is_callable($action)) {
-            //inject here
-            return $action();
-        }
-
-        if (is_array($action)) {
-            [$controller, $method] = $action;
-
-            if (!class_exists($controller)) {
-                echo "controller $controller not found";
-                return null;
-            }
-
-            if (!method_exists($controller, $method)) {
-                echo "method $method does not exist on $controller";
-                return null;
-            }
-            //inject here
-            return (new $controller())->$method();
-        }
+        return $this->routes[$path]->handleActionForMethod($requestMethod);
     }
 
     public function isPathRegistered($path): bool
@@ -103,6 +78,6 @@ class Router
 
     public function isMethodRegisteredForPath($path, $method): bool
     {
-        return array_key_exists($method, $this->routes[$path]);
+        return $this->routes[$path]->hasMethod($method);
     }
 }

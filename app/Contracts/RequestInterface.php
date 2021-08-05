@@ -93,7 +93,7 @@ interface RequestInterface extends MessageInterface
      * @return UriInterface Returns a UriInterface instance
      *     representing the URI of the request.
      */
-    public function getUri(): UriInterface;
+    public function getUri(): string;
 
     /**
      * Returns an instance with the provided URI.

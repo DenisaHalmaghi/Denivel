@@ -77,6 +77,7 @@ class Application extends Container
     public function start()
     {
         $this->singleton(Request::class, fn() => Request::fromGlobals());
+
         $this->registerUserDefinedProviders();
         $this->bootProviders();
 
