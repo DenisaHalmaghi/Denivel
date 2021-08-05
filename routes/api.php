@@ -8,20 +8,22 @@ Router::get("/", function () {
 });
 
 //TODO:
-// Router::prefix('api')->group(function () {
-//   Router::prefix('v1')->group(function () {
-//     Router::prefix('auth')->group(function () {
-//       Router::get('/login', function () {
-//         return "login";
-//       });
-//     });
-//   });
-// });
+ Router::prefix('api')->group(function () {
+    Router::prefix('v1')->group(function () {
+        Router::prefix('auth')->group(function () {
+            Router::get('/login', function () {
+                return "login";
+            });
 
-// Router::prefix('auth')->group(function () {
-//   Router::get('/login', function () {
-//     return "login";
-//   });
-// });
+            Router::get('/register', function () {
+                return "register";
+            });
+        });
 
-Router::get("/home", [TestController::class, "index"]);
+        Router::get('/users', function () {
+            return "users";
+        });
+    });
+ });
+
+ Router::get("/home", [TestController::class, "index"]);

@@ -31,6 +31,11 @@ class Route
         return in_array($method, $this->methods);
     }
 
+    public function isForPath(string $path): bool
+    {
+        return $this->uri === $path;
+    }
+
     public function handleActionForMethod($method): mixed
     {
         $action = $this->actions[$method];

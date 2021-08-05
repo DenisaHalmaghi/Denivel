@@ -11,7 +11,7 @@ class Router
 
     protected ServerRequestInterface $request;
 
-    protected $prefixes = [];
+    protected $prefixesStack = [];
 
     /**
        * Class constructor.
@@ -23,22 +23,33 @@ class Router
 
     public function get($path, $callback)
     {
-        $this->routes[$path] = $this->createRoute($path, Request::METHOD_GET, $callback);
+        $this->routes[] = $this->createRoute($path, Request::METHOD_GET, $callback);
     }
 
     public function post($path, $callback)
     {
-        $this->routes[$path] = $this->createRoute($path, Request::METHOD_POST, $callback);
+        $this->routes[] = $this->createRoute($path, Request::METHOD_POST, $callback);
     }
 
     protected function createRoute($uri, $method, $action): Route
     {
-        return new Route($uri, $method, $action);
+        $realPath = $this->appendPrefix($uri);
+        return new Route($realPath, $method, $action);
+    }
+
+    protected function getPrefix()
+    {
+        return end($this->prefixesStack);
+    }
+
+    protected function appendPrefix($prefix)
+    {
+        return rtrim($this->getPrefix(), "/") . '/' . ltrim($prefix, "/");
     }
 
     public function prefix($prefix)
     {
-        $this->prefixes[] = $prefix;
+        $this->prefixesStack[] = $this->appendPrefix($prefix);
         return $this;
     }
 
@@ -51,33 +62,34 @@ class Router
 
     public function group(callable $callable)
     {
+        $callable();
+        array_pop($this->prefixesStack);
     }
 
     public function resolveRoute()
     {
         $path = $this->request->getUri();
 
-        if (!$this->isPathRegistered($path)) {
+        if (!($route = $this->getMatchedRoute($path))) {
             echo "$path is not registered";
             return null;
         }
 
-        $requestMethod = $this->request->getMethod();
-
-        if (!$this->isMethodRegisteredForPath($path, $requestMethod)) {
+        if (!$route->hasMethod($requestMethod = $this->request->getMethod())) {
             echo "$path does not support $requestMethod requests";
             return null;
         }
-        return $this->routes[$path]->handleActionForMethod($requestMethod);
+
+        return $route->handleActionForMethod($requestMethod);
     }
 
-    public function isPathRegistered($path): bool
+    public function getMatchedRoute($path): ?Route
     {
-        return array_key_exists($path, $this->routes);
-    }
-
-    public function isMethodRegisteredForPath($path, $method): bool
-    {
-        return $this->routes[$path]->hasMethod($method);
+        foreach ($this->routes as $route) {
+            if ($route->isForPath($path)) {
+                return $route;
+            }
+        }
+        return null;
     }
 }
