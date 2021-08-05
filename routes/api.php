@@ -1,29 +1,29 @@
 <?php
 
 use App\Controllers\TestController;
-use App\Framework\Facades\Router;
+use App\Framework\Facades\Route;
 
-Router::get("/", function () {
+Route::get("/", function () {
     return "che fachetzi?";
 });
 
 //TODO:
- Router::prefix('api')->group(function () {
-    Router::prefix('v1')->group(function () {
-        Router::prefix('auth')->group(function () {
-            Router::get('/login', function () {
+ Route::prefix('api')->group(function () {
+    Route::prefix('v1')->group(function () {
+        Route::prefix('auth')->group(function () {
+            Route::get('/login', function () {
                 return "login";
             });
 
-            Router::get('/register', function () {
+            Route::get('/register', function () {
                 return "register";
             });
         });
 
-        Router::get('/users', function () {
+        Route::get('/users', function () {
             return "users";
         });
     });
  });
 
- Router::get("/home", [TestController::class, "index"]);
+ Route::get("/home", [TestController::class, "index"]);
