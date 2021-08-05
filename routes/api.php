@@ -1,7 +1,7 @@
 <?php
 
-use App\Framework\Facades\Router;
 use App\Controllers\TestController;
+use App\Framework\Facades\Router;
 
 Router::get("/", function () {
     return "che fachetzi?";

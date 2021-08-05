@@ -18,7 +18,7 @@ class Router
    */
     public function __construct(Request $request = null)
     {
-        $this->request = new Request();
+        $this->request =  Request::fromGlobals();
     }
 
     public function get($path, $callback)
@@ -42,10 +42,11 @@ class Router
         return $this;
     }
 
-    public function middleware($prefix)
+    public function middleware($middleware)
     {
-        $this->prefixes[] = $prefix;
-        return $this;
+        if (is_array($middleware)) {
+            return ;
+        }
     }
 
     public function group(callable $callable)
@@ -61,7 +62,7 @@ class Router
             return null;
         }
 
-        $requestMethod = $this->request->method();
+        $requestMethod = $this->request->getMethod();
 
         if (!$this->isMethodRegisteredForPath($path, $requestMethod)) {
             echo "$path does not support $requestMethod requests";
@@ -83,12 +84,12 @@ class Router
 
             if (!class_exists($controller)) {
                 echo "controller $controller not found";
-                return;
+                return null;
             }
 
             if (!method_exists($controller, $method)) {
                 echo "method $method does not exist on $controller";
-                return;
+                return null;
             }
             //inject here
             return (new $controller())->$method();

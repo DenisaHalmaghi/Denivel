@@ -11,9 +11,11 @@ class Route
      *
      * @var array
      */
-    public array $methods;
+    public array $methods = [];
 
-    public array actions;
+    protected array $middleware = [];
+
+    public array $actions = [];
 
     public function __construct(
         protected string $uri,

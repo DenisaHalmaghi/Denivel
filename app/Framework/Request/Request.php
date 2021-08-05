@@ -64,6 +64,23 @@ class Request implements ServerRequestInterface
         $this->serverParams == $serverParams;
     }
 
+    public static function fromGlobals(): static
+    {
+//        var_dump(file_get_contents("php://input"));
+//        die();
+
+        return (new Request(
+            $_SERVER['REQUEST_URI'],
+            $_SERVER['REQUEST_METHOD'],
+            getallheaders(),
+            serverParams: $_SERVER
+        ))
+            ->withCookieParams($_COOKIE)
+            ->withUploadedFiles($_FILES)
+            ->withQueryParams($_GET)
+            ->withParsedBody($_POST);
+    }
+
     public function path(): string
     {
         $uri = explode("?", $_SERVER["REQUEST_URI"]);

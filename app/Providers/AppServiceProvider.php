@@ -9,7 +9,7 @@ class AppServiceProvider implements ServiceProvider
     public function register()
     {
       //register stuff in container
-        echo "--------------AppServiceProvider register -------";
+//        echo "--------------AppServiceProvider register -------";
     }
 
     public function boot()
