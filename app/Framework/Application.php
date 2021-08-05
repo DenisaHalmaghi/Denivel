@@ -2,6 +2,7 @@
 
 namespace App\Framework;
 
+use App\Framework\Request\Request;
 use App\Framework\Router\Router;
 use App\Framework\Container\Container;
 use App\Framework\Providers\RouteServiceProvider;
@@ -75,6 +76,7 @@ class Application extends Container
 
     public function start()
     {
+        $this->singleton(Request::class, fn() => Request::fromGlobals());
         $this->registerUserDefinedProviders();
         $this->bootProviders();
 

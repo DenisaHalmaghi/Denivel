@@ -13,12 +13,12 @@ class Router
 
     protected $prefixes = [];
 
-  /**
-   * Class constructor.
+    /**
+       * Class constructor.
    */
     public function __construct(Request $request = null)
     {
-        $this->request =  Request::fromGlobals();
+        $this->request = app(Request::class);
     }
 
     public function get($path, $callback)
