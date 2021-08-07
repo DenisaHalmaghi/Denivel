@@ -7,7 +7,6 @@ Route::get("/", function () {
     return "che fachetzi?";
 });
 
-//TODO:
  Route::prefix('api')->group(function () {
     Route::prefix('v1')->group(function () {
         Route::prefix('auth')->group(function () {
@@ -24,6 +23,14 @@ Route::get("/", function () {
             return "users";
         });
     });
+ });
+
+ Route::middleware(['api'])->group(function () {
+     Route::middleware(['auth'])->group(function () {
+         Route::get('/test', function () {
+             return "test";
+         });
+     });
  });
 
  Route::get("/home", [TestController::class, "index"]);

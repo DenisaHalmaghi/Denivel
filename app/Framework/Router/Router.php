@@ -11,7 +11,7 @@ class Router
 
     protected ServerRequestInterface $request;
 
-    protected $prefixesStack = [];
+    protected $groupStack = [];
 
     /**
        * Class constructor.
@@ -37,33 +37,42 @@ class Router
         return new Route($realPath, $method, $action);
     }
 
-    protected function getPrefix()
+    protected function getGroupAttribute($attribute, $default = [])
     {
-        return end($this->prefixesStack);
+        $last = end($this->groupStack) ;
+        if (!$last) {
+            $last = [];
+        }
+        return array_key_exists($attribute, $last) ? $last[$attribute] : $default;
     }
 
     protected function appendPrefix($prefix)
     {
-        return rtrim($this->getPrefix(), "/") . '/' . ltrim($prefix, "/");
+        return rtrim($this->getGroupAttribute("prefix", ""), "/") . '/' . ltrim($prefix, "/");
+    }
+
+    private function appendMiddleware($middleware)
+    {
+        return array_merge($this->getGroupAttribute("middleware"), $middleware);
     }
 
     public function prefix($prefix)
     {
-        $this->prefixesStack[] = $this->appendPrefix($prefix);
+        $this->groupStack[] = ["prefix" => $this->appendPrefix($prefix)];
         return $this;
     }
 
     public function middleware($middleware)
     {
-        if (is_array($middleware)) {
-            return ;
-        }
+        $this->groupStack[] = ["middleware" => $this->appendMiddleware($middleware)];
+
+        return $this;
     }
 
     public function group(callable $callable)
     {
         $callable();
-        array_pop($this->prefixesStack);
+        array_pop($this->groupStack);
     }
 
     public function resolveRoute()
