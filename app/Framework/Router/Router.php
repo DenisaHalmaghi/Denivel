@@ -33,8 +33,9 @@ class Router
 
     protected function createRoute($uri, $method, $action): Route
     {
-        $realPath = $this->appendPrefix($uri);
-        return new Route($realPath, $method, $action);
+        $path = $this->appendPrefix($uri);
+        return (new Route($path, $method, $action))
+            ->middleware($this->getGroupAttribute("middleware"));
     }
 
     protected function getGroupAttribute($attribute, $default = [])
@@ -51,7 +52,7 @@ class Router
         return rtrim($this->getGroupAttribute("prefix", ""), "/") . '/' . ltrim($prefix, "/");
     }
 
-    private function appendMiddleware($middleware)
+    private function mergeGroupMiddleware($middleware)
     {
         return array_merge($this->getGroupAttribute("middleware"), $middleware);
     }
@@ -64,7 +65,7 @@ class Router
 
     public function middleware($middleware)
     {
-        $this->groupStack[] = ["middleware" => $this->appendMiddleware($middleware)];
+        $this->groupStack[] = ["middleware" => $this->mergeGroupMiddleware($middleware)];
 
         return $this;
     }

@@ -20,10 +20,17 @@ class Route
     public function __construct(
         protected string $uri,
         string $method,
-        array|Closure $action
+        array|Closure $action,
     ) {
         $this->methods[] = $method;
         $this->actions[$method] = $action;
+    }
+
+    public function middleware(array|string $middleware)
+    {
+        $middleware = is_array($middleware) ? $middleware : [$middleware];
+        $this->middleware = [$this->middleware,...$middleware];
+        return $this;
     }
 
     public function hasMethod(string $method)
