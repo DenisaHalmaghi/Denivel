@@ -25,11 +25,9 @@ Route::get("/", function () {
     });
  });
 
- Route::middleware(['api'])->group(function () {
-     Route::middleware(['auth'])->group(function () {
-         Route::get('/test', function () {
-             return "test";
-         });
+ Route::middleware([\App\Middleware\SayHi::class])->group(function () {
+     Route::get('/test', function () {
+         return "test";
      });
  });
 

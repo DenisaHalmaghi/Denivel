@@ -2,11 +2,15 @@
 
 namespace App\Framework;
 
+use App\Framework\Contracts\ServerRequestInterface;
+use App\Framework\Request\Handler;
 use App\Framework\Request\Request;
+use App\Framework\Router\Route;
 use App\Framework\Router\Router;
 use App\Framework\Container\Container;
 use App\Framework\Providers\RouteServiceProvider;
 use App\Framework\Providers\ServiceProvider;
+use Psr\Http\Server\MiddlewareInterface;
 
 class Application extends Container
 {
@@ -76,11 +80,23 @@ class Application extends Container
 
     public function start()
     {
-        $this->singleton(Request::class, fn() => Request::fromGlobals());
+        $request = Request::fromGlobals();
+        $this->singleton(Request::class, fn() => $request);
 
         $this->registerUserDefinedProviders();
         $this->bootProviders();
 
-        echo $this->resolve(Router::class)->resolveRoute();
+        $route = $this->resolve(Router::class)->resolveRoute();
+
+        $this->runRouteMiddleware($request, $route);
+    }
+
+    private function runRouteMiddleware(ServerRequestInterface $request, Route $route)
+    {
+        /** @var MiddlewareInterface $middleware */
+        foreach ($assignedMiddleware = $route->getMiddleware() as $middleware) {
+            $next = next($assignedMiddleware) ?: new Handler(fn()=>$route->handleActionForMethod($request->getMethod()));
+            (new $middleware())->process($request, $next);
+        }
     }
 }

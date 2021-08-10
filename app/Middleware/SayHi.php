@@ -2,22 +2,23 @@
 
 namespace App\Middleware;
 
-use App\Contracts\RequestHandlerInterface;
-use App\Contracts\ResponseInterface;
-use App\Contracts\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
+use App\Framework\Contracts\MiddlewareInterface;
+use App\Framework\Contracts\RequestHandlerInterface;
+use App\Framework\Contracts\ResponseInterface;
+use App\Framework\Contracts\ServerRequestInterface;
 
 class SayHi implements MiddlewareInterface
 {
 
     /**
      * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
+     * @param RequestHandlerInterface $next
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface
     {
         echo "hi!</br>";
-        return $handler->handle($request);
+
+        $next->handle($request);
     }
 }

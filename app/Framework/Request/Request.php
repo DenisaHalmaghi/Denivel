@@ -2,10 +2,10 @@
 
 namespace App\Framework\Request;
 
-use App\Contracts\RequestInterface;
-use App\Contracts\ServerRequestInterface;
-use App\Contracts\StreamInterface;
-use App\Contracts\UriInterface;
+use App\Framework\Contracts\RequestInterface;
+use App\Framework\Contracts\ServerRequestInterface;
+use App\Framework\Contracts\StreamInterface;
+use App\Framework\Contracts\UriInterface;
 use App\Framework\Traits\MessageTrait;
 use JetBrains\PhpStorm\Pure;
 

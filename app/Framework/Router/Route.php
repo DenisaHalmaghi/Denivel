@@ -26,14 +26,22 @@ class Route
         $this->actions[$method] = $action;
     }
 
-    public function middleware(array|string $middleware)
+    public function middleware(array|string $middleware): static
     {
         $middleware = is_array($middleware) ? $middleware : [$middleware];
-        $this->middleware = [$this->middleware,...$middleware];
+        if (!empty($middleware)) {
+            $this->middleware = [...$this->middleware,...$middleware];
+        }
+
         return $this;
     }
 
-    public function hasMethod(string $method)
+    public function getMiddleware(): array
+    {
+        return $this->middleware;
+    }
+
+    public function hasMethod(string $method): bool
     {
         return in_array($method, $this->methods);
     }

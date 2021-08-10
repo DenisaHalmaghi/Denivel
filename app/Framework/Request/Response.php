@@ -2,8 +2,8 @@
 
 namespace App\Framework\Request;
 
-use App\Contracts\ResponseInterface;
-use App\Contracts\StreamInterface;
+use App\Framework\Contracts\ResponseInterface;
+use App\Framework\Contracts\StreamInterface;
 use App\Framework\Traits\MessageTrait;
 
 class Response implements ResponseInterface

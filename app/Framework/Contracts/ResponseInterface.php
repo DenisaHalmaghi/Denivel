@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contracts;
+namespace App\Framework\Contracts;
 
 /**
  * Representation of an outgoing, server-side response.

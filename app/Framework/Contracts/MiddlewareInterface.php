@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Contracts;
-namespace Psr\Http\Server;
+namespace App\Framework\Contracts;
 
-use App\Contracts\RequestHandlerInterface;
-use App\Contracts\ResponseInterface;
-use App\Contracts\ServerRequestInterface;
+use App\Framework\Contracts\RequestHandlerInterface;
+use App\Framework\Contracts\ResponseInterface;
+use App\Framework\Contracts\ServerRequestInterface;
 
 /**
  * Participant in processing a server request and response.
@@ -23,5 +22,5 @@ interface MiddlewareInterface
      * If unable to produce the response itself, it may delegate to the provided
      * request handler to do so.
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface;
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface;
 }

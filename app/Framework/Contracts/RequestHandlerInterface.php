@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contracts;
+namespace App\Framework\Contracts;
 
 /**
  * Handles a server request and produces a response.

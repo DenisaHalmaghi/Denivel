@@ -2,7 +2,7 @@
 
 namespace App\Framework\Router;
 
-use App\Contracts\ServerRequestInterface;
+use App\Framework\Contracts\ServerRequestInterface;
 use App\Framework\Request\Request;
 
 class Router
@@ -76,21 +76,22 @@ class Router
         array_pop($this->groupStack);
     }
 
-    public function resolveRoute()
+    /**
+     * @throws \Exception
+     */
+    public function resolveRoute(): Route
     {
         $path = $this->request->getUri();
 
         if (!($route = $this->getMatchedRoute($path))) {
-            echo "$path is not registered";
-            return null;
+            throw new \Exception("$path is not registered");
         }
 
         if (!$route->hasMethod($requestMethod = $this->request->getMethod())) {
-            echo "$path does not support $requestMethod requests";
-            return null;
+            throw new \Exception("$path does not support $requestMethod requests");
         }
 
-        return $route->handleActionForMethod($requestMethod);
+        return $route;
     }
 
     public function getMatchedRoute($path): ?Route

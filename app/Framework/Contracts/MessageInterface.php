@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contracts;
+namespace App\Framework\Contracts;
 
 /**
  * HTTP messages consist of requests from a client to a server and responses
