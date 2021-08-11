@@ -1,6 +1,8 @@
 <?php
 
 use App\Framework\Container\Container;
+use App\Framework\Request\Response;
+use JetBrains\PhpStorm\Pure;
 
 function app($containerKey = null)
 {
@@ -14,4 +16,9 @@ function app($containerKey = null)
 function baseUrl($appenedUrl = "")
 {
     return app()->getBasePath();
+}
+
+#[Pure] function response(string $body, int $status): Response
+{
+    return new Response($status, body:$body);
 }

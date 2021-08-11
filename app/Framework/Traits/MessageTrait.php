@@ -234,7 +234,9 @@ trait MessageTrait
      */
     public function withBody($body): static
     {
-        return new static($this->headers, $this->version);
+        $newInstance = clone $this;
+        $newInstance->body = $body;
+        return $newInstance;
     }
 
     protected function headerValueToArray(array|string $value): array

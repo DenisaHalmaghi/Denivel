@@ -96,7 +96,7 @@ class Application extends Container
         return Request::fromGlobals();
     }
 
-    public function start(): ResponseInterface
+    public function processRequest(): ResponseInterface
     {
         $this->bindRequest();
 

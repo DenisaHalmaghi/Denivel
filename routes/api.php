@@ -5,8 +5,10 @@ use App\Framework\Facades\Route;
 use App\Middleware\SayHello;
 use App\Middleware\SayHi;
 
-Route::get("/", function () {
-    return "che fachetzi?";
+Route::middleware([SayHi::class,SayHello::class])->group(function () {
+    Route::get('/', function () {
+        return response("che fachetzi?", 201);
+    });
 });
 
  Route::prefix('api')->group(function () {
@@ -25,12 +27,6 @@ Route::get("/", function () {
             return "users";
         });
     });
- });
-
- Route::middleware([SayHi::class,SayHello::class])->group(function () {
-     Route::get('/test', function () {
-         return "test";
-     });
  });
 
  Route::get("/home", [TestController::class, "index"]);
