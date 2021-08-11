@@ -21,6 +21,7 @@ class Handler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return ($this->callable)($request);
+        $response = ($this->callable)($request);
+        return  $response instanceof ResponseInterface ? $response : new Response(200, [], $response);
     }
 }

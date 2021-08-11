@@ -2,6 +2,8 @@
 
 use App\Controllers\TestController;
 use App\Framework\Facades\Route;
+use App\Middleware\SayHello;
+use App\Middleware\SayHi;
 
 Route::get("/", function () {
     return "che fachetzi?";
@@ -25,7 +27,7 @@ Route::get("/", function () {
     });
  });
 
- Route::middleware([\App\Middleware\SayHi::class])->group(function () {
+ Route::middleware([SayHi::class,SayHello::class])->group(function () {
      Route::get('/test', function () {
          return "test";
      });

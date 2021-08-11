@@ -2,6 +2,7 @@
 
 namespace App\Framework;
 
+use App\Framework\Contracts\RequestHandlerInterface;
 use App\Framework\Contracts\ServerRequestInterface;
 use App\Framework\Request\Handler;
 use App\Framework\Request\Request;
@@ -91,12 +92,30 @@ class Application extends Container
         $this->runRouteMiddleware($request, $route);
     }
 
-    private function runRouteMiddleware(ServerRequestInterface $request, Route $route)
+    protected function runRouteMiddleware(ServerRequestInterface $request, Route $route)
     {
-        /** @var MiddlewareInterface $middleware */
-        foreach ($assignedMiddleware = $route->getMiddleware() as $middleware) {
-            $next = next($assignedMiddleware) ?: new Handler(fn()=>$route->handleActionForMethod($request->getMethod()));
-            (new $middleware())->process($request, $next);
-        }
+        $response =  array_reduce(
+            array_reverse($route->getMiddleware()),
+            $this->carry(),
+            new Handler(fn()=>$route->handleActionForMethod($request->getMethod()))
+        )
+            ->handle($request);
+
+        echo $response->getBody();
+    }
+
+    protected function carry()
+    {
+        return function (RequestHandlerInterface $next, $current) {
+            return new Handler(function ($request) use ($next, $current) {
+                if (is_string($current)) {
+                    //instantiate the middleware
+                    $current = (new $current($next));
+                } elseif (is_callable($next)) {
+                    $current = new Handler($current);
+                }
+                return $current->handle($request);
+            });
+        };
     }
 }

@@ -75,11 +75,12 @@ class Response implements ResponseInterface
 
     public function __construct(
         protected int $code,
-        protected array $headers = [],
+        array $headers = [],
         string $body = null,
         string $version = '1.1'
     ) {
-        $this->body = $body;
+        $this->headers = $headers;
+        $this->body = $body ?? "";
         $this->$version = $version;
     }
 
