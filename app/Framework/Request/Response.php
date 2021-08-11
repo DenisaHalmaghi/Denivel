@@ -84,7 +84,6 @@ class Response implements ResponseInterface
         $this->$version = $version;
     }
 
-
     /**
      * @inheritDoc
      */
@@ -109,5 +108,10 @@ class Response implements ResponseInterface
     public function getReasonPhrase(): string
     {
         return self::REASON_PHRASES[$this->code];
+    }
+
+    public function __toString(): string
+    {
+        return $this->body;
     }
 }

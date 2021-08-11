@@ -3,6 +3,7 @@
 namespace App\Framework;
 
 use App\Framework\Contracts\RequestHandlerInterface;
+use App\Framework\Contracts\ResponseInterface;
 use App\Framework\Contracts\ServerRequestInterface;
 use App\Framework\Request\Handler;
 use App\Framework\Request\Request;
@@ -11,7 +12,6 @@ use App\Framework\Router\Router;
 use App\Framework\Container\Container;
 use App\Framework\Providers\RouteServiceProvider;
 use App\Framework\Providers\ServiceProvider;
-use Psr\Http\Server\MiddlewareInterface;
 
 class Application extends Container
 {
@@ -20,9 +20,11 @@ class Application extends Container
    */
     protected array $providers = [];
 
-    protected $basePath = "";
+    protected string $basePath = "";
 
     protected Container $container;
+
+    protected ServerRequestInterface $request;
 
     public function __construct($basePath)
     {
@@ -33,11 +35,15 @@ class Application extends Container
 
     protected function bootstrap()
     {
-        //"activate" helpers
-        require_once __DIR__ . "/helpers.php";
+        $this->requireHelpers();
 
         $this->selfBind();
         $this->registerCoreProviders();
+    }
+
+    protected function requireHelpers()
+    {
+        require_once __DIR__ . "/helpers.php";
     }
 
     protected function selfBind()
@@ -68,8 +74,8 @@ class Application extends Container
     protected function registerUserDefinedProviders()
     {
         $providersFile = $this->basePath("config/providers.php");
-        $providers = (require_once $providersFile)["providers"];
-        foreach ($providers as $provider) {
+        $userDefinedProviders = (require_once $providersFile)["providers"];
+        foreach ($userDefinedProviders as $provider) {
             $this->registerProvider(new $provider());
         }
     }
@@ -79,42 +85,50 @@ class Application extends Container
         return $nestedPath ? $this->basePath . "/$nestedPath" : $this->basePath;
     }
 
-    public function start()
+    protected function bindRequest(): void
     {
-        $request = Request::fromGlobals();
-        $this->singleton(Request::class, fn() => $request);
+        $this->request = $this->createRequest();
+        $this->singleton(Request::class, fn() => $this->request);
+    }
+
+    protected function createRequest(): ServerRequestInterface
+    {
+        return Request::fromGlobals();
+    }
+
+    public function start(): ResponseInterface
+    {
+        $this->bindRequest();
 
         $this->registerUserDefinedProviders();
+
         $this->bootProviders();
 
         $route = $this->resolve(Router::class)->resolveRoute();
 
-        $this->runRouteMiddleware($request, $route);
+        return $this->passRequestThroughRouteMiddleware($route);
     }
 
-    protected function runRouteMiddleware(ServerRequestInterface $request, Route $route)
+    protected function passRequestThroughRouteMiddleware(Route $route): ResponseInterface
     {
-        $response =  array_reduce(
+        return array_reduce(
             array_reverse($route->getMiddleware()),
             $this->carry(),
-            new Handler(fn()=>$route->handleActionForMethod($request->getMethod()))
+            new Handler(fn()=>$route->handleActionForMethod($this->request->getMethod()))
         )
-            ->handle($request);
-
-        echo $response->getBody();
+            ->handle($this->request);
     }
 
-    protected function carry()
+    protected function carry(): \Closure
     {
-        return function (RequestHandlerInterface $next, $current) {
-            return new Handler(function ($request) use ($next, $current) {
-                if (is_string($current)) {
-                    //instantiate the middleware
-                    $current = (new $current($next));
-                } elseif (is_callable($next)) {
-                    $current = new Handler($current);
+        return function (RequestHandlerInterface $nextHandler, string|callable|RequestHandlerInterface $currentHandler) {
+            return new Handler(function ($request) use ($nextHandler, $currentHandler) {
+                if (is_string($currentHandler)) {
+                    $currentHandler = (new $currentHandler($nextHandler));
+                } elseif (is_callable($nextHandler)) {
+                    $currentHandler = new Handler($currentHandler);
                 }
-                return $current->handle($request);
+                return $currentHandler->handle($request);
             });
         };
     }
